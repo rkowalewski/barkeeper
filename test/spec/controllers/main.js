@@ -3,7 +3,10 @@
 describe('Controller: MainCtrl', function () {
 
   // load the controller's module
-  beforeEach(module('myApp'));
+  beforeEach(function(){
+      module('barkeeper.controllers');
+      module('ngRoute');
+  });
 
   var MainCtrl,
     scope;
