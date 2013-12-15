@@ -1,5 +1,5 @@
 'use strict';
-angular.module('barkeeper.directives', ['d3'])
+angular.module('barkeeper.barChart', ['d3'])
     .directive('barChart', ['$window', 'd3Service', function ($window, d3Service) {
         return {
             restrict: 'EA',
@@ -34,12 +34,14 @@ angular.module('barkeeper.directives', ['d3'])
                         svg.selectAll('*').remove();
 
                         // If we don't pass any data, return out of the element
-                        if (!data) return;
+                        if (!data) {
+                            return;
+                        }
 
                         // setup variables
                         var width = d3.select(element[0]).node().offsetWidth - margin,
                         // calculate the height
-                            height = scope.data.length * (barHeight + barPadding),
+                            height = data.length * (barHeight + barPadding),
                         // Use the category20() scale function for multicolor support
                             color = d3.scale.category20(),
                         // our xScale
@@ -80,7 +82,7 @@ angular.module('barkeeper.directives', ['d3'])
                             })
                             .attr('x', 15)
                             .text(function(d) {
-                                return d.name + " (scored: " + d.score + ")";
+                                return d.name + ' (scored: ' + d.score + ')';
                             });
                     }
                 });
