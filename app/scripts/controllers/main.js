@@ -7,10 +7,17 @@ angular.module('barkeeper.controllers', ['ngRoute'])
             controller: 'MainCtrl'
         })
     })
-    .controller('MainCtrl', function ($scope) {
+    .controller('MainCtrl', function ($scope, d3Service) {
         $scope.awesomeThings = [
             'HTML5 Boilerplate',
             'AngularJS',
             'Karma'
+        ];
+
+        $scope.d3data = [
+            {name: "Greg", score: 98},
+            {name: "Ari", score: 96},
+            {name: 'Q', score: 75},
+            {name: "Loser", score: 48}
         ];
     });
