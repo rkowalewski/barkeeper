@@ -1,5 +1,5 @@
-Barkeeper App to illustrate D3 Visualization
-============================================
+Barkeeper App
+=============
 Requirements:
 ------------
 - Grunt
