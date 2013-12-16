@@ -15,10 +15,10 @@ angular.module('barkeeper.controllers', ['ngRoute'])
         ];
 
         $scope.d3data = [
-            {name: "Greg", score: 98},
-            {name: "Ari", score: 96},
-            {name: 'Q', score: 75},
-            {name: "Loser", score: 48}
+            {name: "Cola", score: 98},
+            {name: "Orangensaft", score: 96},
+            {name: 'Wasser', score: 75},
+            {name: "Kaffee", score: 48}
         ];
 
         $scope.lineData = [

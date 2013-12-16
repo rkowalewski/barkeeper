@@ -1,7 +1,7 @@
 var express = require('express')
-  , http = require('http')
-  , path = require('path')
-  , routes = require('./routes');
+    , http = require('http')
+    , path = require('path')
+    , utils = require('./utils');
 
 var app = express();
 
@@ -15,11 +15,18 @@ app.use(express.static(path.join(__dirname, '..', 'app')));
 
 // development only
 if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
+    app.use(express.errorHandler());
 }
 
-app.get('/test', routes.index);
+app.get('/basket', function (req, res) {
+    utils.executeQuery('SELECT count(id) from 10basket', res);
+});
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+app.get('/error', function (req, res) {
+    utils.executeQuery('SELECT count(id) from error', res);
+});
+
+
+app.listen(app.get('port'), function () {
+    console.log('Express server listening on port ' + app.get('port'));
 });
