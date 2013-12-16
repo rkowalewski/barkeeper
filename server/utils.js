@@ -1,3 +1,5 @@
+'use strict';
+
 var mysql = require('mysql');
 
 var dbConfig = {
@@ -7,7 +9,7 @@ var dbConfig = {
     database: 'barkeeper'
 };
 
-exports.executeQuery = function (query, res) {
+exports.executeQuery = function (query, fn) {
     var connection = mysql.createConnection(dbConfig);
     connection.connect();
 
@@ -22,11 +24,24 @@ exports.executeQuery = function (query, res) {
                 json = {error: JSON.stringify(err)}
             }
         } else {
-            json = JSON.stringify(results);
+            json = results;
         }
 
         connection.end();
 
-        res.send(json);
+        fn(json);
     });
+};
+
+
+exports.unixDatePeriod = function (year) {
+    var start = new Date(year, 0),
+        end = new Date(year, 11, 23, 59),
+        startUnix = Math.round(start / 1000),
+        endUnix = Math.round(end / 1000);
+
+    return {
+        start: startUnix,
+        end: endUnix
+    };
 };
