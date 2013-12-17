@@ -1,8 +1,11 @@
 'use strict';
-angular.module('barkeeper', ['barkeeper.controllers', 'barkeeper.lineChart', 'barkeeper.barChart', 'ngRoute'])
+angular.module('barkeeper', ['barkeeper.controllers', 'ngRoute', 'restangular'])
     .config(function ($routeProvider) {
         $routeProvider
             .otherwise({
-                redirectTo: '/'
+                redirectTo: '/users'
             });
-    });
+    })
+    .config(['RestangularProvider', function (RestangularProvider) {
+        RestangularProvider.setBaseUrl('/api');
+    }]);

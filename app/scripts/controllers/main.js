@@ -1,18 +1,49 @@
 'use strict';
 
-angular.module('barkeeper.controllers', ['ngRoute'])
+angular.module('barkeeper.controllers', ['ngRoute', 'restangular', 'barkeeper.lineChart', 'barkeeper.barChart'])
     .config(function ($routeProvider) {
-        $routeProvider.when('/', {
-            templateUrl: 'views/main.html',
-            controller: 'MainCtrl'
-        })
+        $routeProvider
+            .when('/users', {
+                templateUrl: 'views/main.html',
+                controller: 'MainCtrl',
+                resolve: {
+                    users: function (Restangular) {
+                        return Restangular.all('users').getList();
+                    }
+                }
+            })
+            .when('/users/:userId', {
+                templateUrl: 'views/detail.html',
+                controller: 'DetailCtrl',
+                resolve: {
+                    barChartData: function(Restangular, $route) {
+                        return Restangular.one('users', $route.current.params.userId).all('items').getList();
+                    },
+                    lineChartData: function(Restangular, $route) {
+                        return Restangular.one('users', $route.current.params.userId).all('costs').getList();
+                    }
+                }
+            })
     })
-    .controller('MainCtrl', function ($scope, d3Service) {
-        $scope.awesomeThings = [
-            'HTML5 Boilerplate',
-            'AngularJS',
-            'Karma'
-        ];
+    .controller('MainCtrl', function ($scope, $location, users) {
+
+        _.forEach(users, function (user) {
+            user.sum = Math.round(Math.abs(user.sum) * 100) / 100
+        });
+
+        users.sort(function(a, b) {
+            return b.sum - a.sum;
+        });
+
+
+        $scope.users = users;
+
+        $scope.viewDetail = function(user) {
+            $location.path('/users/'+user);
+        }
+
+    })
+    .controller('DetailCtrl', function ($scope, barChartData, lineChartData) {
 
         $scope.d3data = [
             {name: "Cola", score: 98},
@@ -1303,5 +1334,4 @@ angular.module('barkeeper.controllers', ['ngRoute'])
             {"date": "25-Apr-07", "close": 95.35},
             {"date": "24-Apr-07", "close": 93.24}
         ];
-
     });

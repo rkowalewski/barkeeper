@@ -1,8 +1,18 @@
-<div>
-    <h1>Testen verschiedener Diagramme</h1>
-    <h2>BarChart</h2>
-    <bar-chart data="d3data"></bar-chart>
+<h1>Barkeeper Overview</h1>
 
-    <h2>Line-Chart</h2>
-    <line-chart data="lineData"></line-chart>
-</div>
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>User</th>
+        <th>Expenses</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr data-ng-repeat="item in users" data-ng-click="viewDetail(item.user)">
+        <td>{{$index + 1}}</td>
+        <td>{{item.user}}</td>
+        <td>{{item.sum}}</td>
+    </tr>
+    </tbody>
+</table>
