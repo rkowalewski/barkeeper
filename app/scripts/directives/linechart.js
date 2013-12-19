@@ -26,7 +26,9 @@ angular.module('barkeeper.lineChart', ['d3'])
                     });
 
                     scope.$parent.$watch('lineChartData', function(items) {
-                        scope.render(items);
+                        if (items.length > 0) {
+                            scope.render(items);
+                        }
                     });
 
                     var timeFormat = function(formats) {

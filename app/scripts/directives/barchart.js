@@ -30,7 +30,9 @@ angular.module('barkeeper.barChart', ['d3'])
                     });
 
                     scope.$parent.$watch('barChartData', function(items) {
-                        scope.render(items);
+                        if (items.length > 0) {
+                            scope.render(items);
+                        }
                     });
 
                     scope.render = function (data) {
