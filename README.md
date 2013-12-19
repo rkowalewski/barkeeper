@@ -2,15 +2,25 @@ Barkeeper App
 =============
 Requirements:
 ------------
-- Grunt
 - Node
 - Bower
 
-Please install those Tools first
+Bower Installation
+```
+npm install -g bower
+```
 
+create database (MySQL):
+```
+mysql -uroot -h localhost barkeeper < barkeeper.sql
+```
+
+install dependencies and run the server
 ```
 git clone git@github.com:rkowalewski/barkeeper.git
 npm install
 bower install
-grunt server
+node server/server.js
 ```
+
+URL:http://localhost:9000
