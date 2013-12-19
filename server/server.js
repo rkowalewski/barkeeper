@@ -22,7 +22,7 @@ if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
 
-app.get('/api/*', function(req, res, next) {
+app.get('/api/*', function (req, res, next) {
     res.contentType('application/json');
     next();
 });
@@ -41,78 +41,59 @@ app.get('/api/users', function (req, res) {
 
 app.get('/api/users/:user/items', function (req, res) {
     var user = req.params.user
+    var year = req.query.year;
 
-    var sql = 'select b.name, b.description, count(*) as score' +
+    var basicSql = 'select b.name, b.description, count(*) as score' +
         ' from 10basket a' +
         ' inner join 10item b' +
         ' on a.item = b.id' +
-        ' where a.user = %s group by (a.item);'
+        ' where a.user = %s';
 
-    utils.executeQuery(jsUtils.format(sql, user), function (json) {
-        res.send(json);
-    });
-});
+    var query, sql;
 
-app.get('/api/users/:user/items/:year', function (req, res) {
-    var user = req.params.user,
-        year = req.params.year;
+    if (year) {
+        var unixDatePeriod = utils.unixDatePeriod(year);
 
-    var unixDatePeriod = utils.unixDatePeriod(year);
+        sql = basicSql +
+            ' and (a.created between %d and %d)' +
+            ' group by (a.item);'
 
-    var sql = 'select b.name, b.description, count(*) as anzahl' +
-        ' from 10basket a' +
-        ' inner join 10item b' +
-        ' on a.item = b.id' +
-        ' where a.user = %s' +
-        ' and (a.created between %d and %d)' +
-        ' group by (a.item);'
+        query = jsUtils.format(sql, user, unixDatePeriod.start, unixDatePeriod.end);
+    } else {
+        sql = basicSql +
+            ' group by (a.item);'
 
-    var query = jsUtils.format(sql, user, unixDatePeriod.start, unixDatePeriod.end);
+        query = jsUtils.format(sql, user);
+    }
 
     utils.executeQuery(query, function (json) {
-        if (json.error) {
-            res.send(json);
-        } else {
-            json = {
-                year: year,
-                items: json
-            }
-
-            res.send(json);
-        }
+        res.send(json);
     });
 });
 
 app.get('/api/users/:user/costs', function (req, res) {
     var user = req.params.user;
+    var year = req.query.year;
 
     var sql = 'select a.amount, a.created as date' +
         ' from 10basket a inner join 10item b' +
         ' on a.item = b.id' +
-        ' where a.user = %s' +
-        ' order by a.created';
+        ' where a.user = %s';
 
-    utils.executeQuery(jsUtils.format(sql, user), function(json) {
-        res.send(json);
-    });
-});
+    var query;
 
-app.get('/api/users/:user/costs/:year', function (req, res) {
-    var user = req.params.user,
-        year = req.params.year;
+    if (year) {
+        var unixDatePeriod = utils.unixDatePeriod(year);
 
-    var unixDatePeriod = utils.unixDatePeriod(year);
+        sql = sql +
+            ' and (a.created between %d and %d)';
 
-    var sql = 'select a.amount, a.created as date' +
-        ' from 10basket a inner join 10item b' +
-        ' on a.item = b.id' +
-        ' where a.user = %s' +
-        ' and (a.created between %d and %d)'+
-        ' order by a.created';
+        var query = jsUtils.format(sql, user, unixDatePeriod.start, unixDatePeriod.end);
+    } else {
+        query = jsUtils.format(sql, user);
+    }
 
-    var query = jsUtils.format(sql, user, unixDatePeriod.start, unixDatePeriod.end);
-
-    utils.executeQuery(query, function(json) {
+    utils.executeQuery(query, function (json) {
         res.send(json);
     });
 });

@@ -29,6 +29,10 @@ angular.module('barkeeper.barChart', ['d3'])
                         scope.render(scope.data);
                     });
 
+                    scope.$parent.$watch('barChartData', function(items) {
+                        scope.render(items);
+                    });
+
                     scope.render = function (data) {
                         // remove all previous items before render
                         svg.selectAll('*').remove();
@@ -68,7 +72,7 @@ angular.module('barkeeper.barChart', ['d3'])
                                 return color(d.score);
                             })
                             .transition()
-                            .duration(1000)
+                            .duration(0)
                             .attr('width', function (d) {
                                 return xScale(d.score);
                             });

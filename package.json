@@ -23,7 +23,7 @@
     "matchdep": "~0.1.1",
     "grunt-google-cdn": "~0.1.1",
     "grunt-ngmin": "~0.0.2",
-    "grunt-express-server": "~0.4.9",
+    "grunt-express-server": "~0.4.10",
     "grunt-contrib-watch": "~0.5.3",
     "mysql": "~2.0.0-rc2",
     "util": "~0.10.1"

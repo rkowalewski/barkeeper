@@ -25,9 +25,9 @@ angular.module('barkeeper.lineChart', ['d3'])
                         scope.render(scope.data);
                     });
 
-                    scope.$parent.$watch('lineChartData', function(data) {
-                        console.log(data);
-                    })
+                    scope.$parent.$watch('lineChartData', function(items) {
+                        scope.render(items);
+                    });
 
                     var timeFormat = function(formats) {
                         return function(date) {
@@ -35,7 +35,7 @@ angular.module('barkeeper.lineChart', ['d3'])
                             while (!f[1](date)) f = formats[--i];
                             return f[0](date);
                         };
-                    }
+                    };
 
                     var dateFormatsFilter = timeFormat([
                         [d3.time.format("%Y"), function() { return true; }],

@@ -2,38 +2,44 @@ angular.module('barkeeper.stats', ['restangular'])
     .factory('stats', function (Restangular, $q) {
         var drinks = function (userId, year) {
             var deferred = $q.defer();
-            var call = Restangular.one('users', userId);
+
+            var call = Restangular.one('users', userId).all('items');
+
+            var success = function(items) {
+                deferred.resolve(transformBarChartData(items));
+            };
+
+            var error = function (err) {
+                deferred.reject(err);
+            };
 
             if (year) {
-                call = call.all('items', year);
-
+                call.getList({year:year}).then(success, error);
             } else {
-                call = call.all('items')
+                call.getList().then(success, error);
             }
-
-            call.getList().then(function (items) {
-                deferred.resolve(transformBarChartData(items));
-            }, function (err) {
-                deferred.reject(err);
-            });
 
             return deferred.promise;
         }
 
         var costs = function (userId, year) {
             var deferred = $q.defer();
-            var call = Restangular.one('users', userId);
-            if (year) {
-                call = call.all('costs', year);
-            } else {
-                call = call.all('costs');
-            }
 
-            call.getList().then(function (costs) {
+            var call = Restangular.one('users', userId).all('costs');
+
+            var success = function(costs) {
                 deferred.resolve(transformLineChartData(costs));
-            }, function (err) {
+            };
+
+            var error = function (err) {
                 deferred.reject(err);
-            });
+            };
+
+            if (year) {
+                call = call.getList({year:year}).then(success, error);
+            } else {
+                call = call.getList().then(success, error);
+            }
 
             return deferred.promise;
         }
