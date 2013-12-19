@@ -42,7 +42,7 @@ app.get('/api/users', function (req, res) {
 app.get('/api/users/:user/items', function (req, res) {
     var user = req.params.user
 
-    var sql = 'select b.name, b.description, count(*) as anzahl' +
+    var sql = 'select b.name, b.description, count(*) as score' +
         ' from 10basket a' +
         ' inner join 10item b' +
         ' on a.item = b.id' +
@@ -86,11 +86,11 @@ app.get('/api/users/:user/items/:year', function (req, res) {
 app.get('/api/users/:user/costs', function (req, res) {
     var user = req.params.user;
 
-    var sql = 'select b.id, b.name, b.description, a.amount,' +
-        ' FROM_UNIXTIME(a.created,\'%Y\') as year' +
+    var sql = 'select a.amount, a.created as date' +
         ' from 10basket a inner join 10item b' +
         ' on a.item = b.id' +
-        ' where a.user = %s';
+        ' where a.user = %s' +
+        ' order by a.created';
 
     utils.executeQuery(jsUtils.format(sql, user), function(json) {
         res.send(json);
@@ -103,12 +103,12 @@ app.get('/api/users/:user/costs/:year', function (req, res) {
 
     var unixDatePeriod = utils.unixDatePeriod(year);
 
-    var sql = 'select b.id, b.name, b.description, a.amount,' +
-        ' FROM_UNIXTIME(a.created,\'%m\') as month' +
+    var sql = 'select a.amount, a.created as date' +
         ' from 10basket a inner join 10item b' +
         ' on a.item = b.id' +
         ' where a.user = %s' +
-        ' and (a.created between %d and %d)';
+        ' and (a.created between %d and %d)'+
+        ' order by a.created';
 
     var query = jsUtils.format(sql, user, unixDatePeriod.start, unixDatePeriod.end);
 

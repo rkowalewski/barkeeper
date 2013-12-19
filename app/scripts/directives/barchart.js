@@ -82,7 +82,7 @@ angular.module('barkeeper.barChart', ['d3'])
                             })
                             .attr('x', 15)
                             .text(function(d) {
-                                return d.name + ' (scored: ' + d.score + ')';
+                                return d.name + ' (' + d.score + ')';
                             });
                     }
                 });

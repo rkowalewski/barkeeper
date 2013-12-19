@@ -13,16 +13,10 @@ angular.module('barkeeper.lineChart', ['d3'])
                     height = 500 - margin.top - margin.bottom;
 
                 d3Service.d3().then(function (d3) {
-                    var parseDate = d3.time.format('%d-%b-%y').parse;
 
                     var svg = d3.select(element[0]).append('svg')
                         .attr("width", width + margin.left + margin.right)
                         .attr('height', height + margin.top + margin.bottom);
-
-                    // Browser onresize event
-                    window.onresize = function () {
-                        scope.$apply();
-                    };
 
                     // Watch for resize event
                     scope.$watch(function () {
@@ -31,19 +25,45 @@ angular.module('barkeeper.lineChart', ['d3'])
                         scope.render(scope.data);
                     });
 
+                    scope.$parent.$watch('lineChartData', function(data) {
+                        console.log(data);
+                    })
+
+                    var timeFormat = function(formats) {
+                        return function(date) {
+                            var i = formats.length - 1, f = formats[i];
+                            while (!f[1](date)) f = formats[--i];
+                            return f[0](date);
+                        };
+                    }
+
+                    var dateFormatsFilter = timeFormat([
+                        [d3.time.format("%Y"), function() { return true; }],
+                        [d3.time.format("%b"), function(d) { return d.getMonth(); }]]);
 
                     scope.render = function (data) {
                         svg.selectAll('*').remove();
 
-                        var x = d3.time.scale()
+                        var minDate = d3.min(data, function(d) {
+                            return d.date;
+                        });
+
+                        var maxDate = d3.max(data, function(d) {
+                            return d.date;
+                        })
+
+                        var x = d3.time.scale().domain([minDate, maxDate])
                             .range([0, width]);
 
-                        var y = d3.scale.linear()
+                        var y = d3.scale.linear().domain([0, d3.max(function (d) {
+                                return d.amount;
+                            })])
                             .range([height, 0]);
 
                         var xAxis = d3.svg.axis()
                             .scale(x)
-                            .orient('bottom');
+                            .orient('bottom')
+                            .tickFormat(dateFormatsFilter);
 
                         var yAxis = d3.svg.axis()
                             .scale(y)
@@ -54,24 +74,17 @@ angular.module('barkeeper.lineChart', ['d3'])
                                 return x(d.date);
                             })
                             .y(function (d) {
-                                return y(d.close);
+                                return y(d.amount);
                             });
 
                         var g = svg.append('g')
                             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
-                        if (!_.isDate(data[0].date)) {
-                            data.forEach(function (d) {
-                                d.date = parseDate(d.date);
-                                d.close = +d.close;
-                            });
-                        }
-
                         x.domain(d3.extent(data, function (d) {
                             return d.date;
                         }));
                         y.domain(d3.extent(data, function (d) {
-                            return d.close;
+                            return d.amount;
                         }));
 
                         g.append('g')
@@ -87,7 +100,7 @@ angular.module('barkeeper.lineChart', ['d3'])
                             .attr('y', 6)
                             .attr('dy', '.71em')
                             .style('text-anchor', 'end')
-                            .text('Gesamtkosten (€)');
+                            .text('Expenses (€)');
 
                         g.append('path')
                             .datum(data)

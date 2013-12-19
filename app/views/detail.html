@@ -1,8 +1,12 @@
 <div>
-    <h1>Testen verschiedener Diagramme</h1>
-    <h2>BarChart</h2>
-    <bar-chart data="d3data"></bar-chart>
+    <slider model="currentYear" type="text" class="span2" value="" min-year="{{minYear}}" max-year="{{maxYear}}"
+            current-year="{{currentYear}}"></slider>
 
-    <h2>Line-Chart</h2>
-    <line-chart data="lineData"></line-chart>
+    <pre ng-bind="currentYear"></pre>
+
+    <h2>Number of drinks you bought</h2>
+    <bar-chart data="barChartData"></bar-chart>
+
+    <h2>Expenses distribution</h2>
+    <line-chart data="lineChartData"></line-chart>
 </div>
