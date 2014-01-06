@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "dependencies": {
     "express": "~3.4.7",
-    "mysql": "~2.0.0-rc2"
+    "mysql": "~2.0.0-rc2",
+    "lodash": "~2.4.1"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

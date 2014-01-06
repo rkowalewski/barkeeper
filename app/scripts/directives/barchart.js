@@ -14,8 +14,7 @@ angular.module('barkeeper.barChart', ['d3'])
 
                 d3Service.d3().then(function (d3) {
                     var svg = d3.select(element[0])
-                        .append("svg")
-                        .style('width', '100%');
+                        .append('svg')
 
                     // Browser onresize event
                     window.onresize = function () {
@@ -35,6 +34,9 @@ angular.module('barkeeper.barChart', ['d3'])
                         }
                     });
 
+                    var leftWidth = 150;
+
+
                     scope.render = function (data) {
                         // remove all previous items before render
                         svg.selectAll('*').remove();
@@ -45,7 +47,7 @@ angular.module('barkeeper.barChart', ['d3'])
                         }
 
                         // setup variables
-                        var width = d3.select(element[0]).node().offsetWidth - margin,
+                        var width = d3.select(element[0]).node().offsetWidth - margin - leftWidth,
                         // calculate the height
                             height = data.length * (barHeight + barPadding),
                         // Use the category20() scale function for multicolor support
@@ -65,8 +67,7 @@ angular.module('barkeeper.barChart', ['d3'])
                             .data(data).enter()
                             .append('rect')
                             .attr('height', barHeight)
-                            .attr('width', 140)
-                            .attr('x', Math.round(margin / 2))
+                            .attr('x', leftWidth + Math.round(margin / 2))
                             .attr('y', function (d, i) {
                                 return i * (barHeight + barPadding);
                             })
@@ -74,21 +75,44 @@ angular.module('barkeeper.barChart', ['d3'])
                                 return color(d.score);
                             })
                             .transition()
-                            .duration(0)
+                            .duration(1000)
                             .attr('width', function (d) {
                                 return xScale(d.score);
                             });
-                        svg.selectAll('text')
+
+                        //Create score captions
+                        svg.selectAll('text.score')
                             .data(data)
                             .enter()
                             .append('text')
                             .attr('fill', '#fff')
                             .attr('y', function(d,i) {
-                                return i * (barHeight + barPadding) + 15;
+                                return i * (barHeight + barPadding) + barHeight - barPadding;
                             })
-                            .attr('x', 15)
+                            .attr('x', function(d) {
+                                return xScale(d.score) + leftWidth;
+                            })
+                            .attr('dx', -40)
+                            .attr('class', 'score')
                             .text(function(d) {
-                                return d.name + ' (' + d.score + ')';
+                                return d.score;
+                            });
+
+
+
+                        //Create item captions
+                        svg.selectAll('text.name')
+                            .data(data)
+                            .enter().append('text')
+                            .attr('x', leftWidth / 2)
+                            .attr('y', function(d,i) {
+                                return i * (barHeight + barPadding) + barHeight - barPadding;
+                            })
+                            .attr('text-anchor', 'middle')
+                            .attr('fill', '#000')
+                            .attr('class', 'name')
+                            .text(function(d) {
+                                return d.name;
                             });
                     }
                 });

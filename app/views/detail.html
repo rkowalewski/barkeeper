@@ -1,7 +1,13 @@
 <div>
     <h3 id="filter">Filter</h3>
-    <slider model="currentYear" type="text" class="span2" value="" min-year="{{minYear}}" max-year="{{maxYear}}"
-            current-year="{{currentYear}}"></slider>
+
+    <div class="filterArea">
+        <slider model="currentYear" type="text" class="span2" value="" min-year="{{minYear}}" max-year="{{maxYear}}"
+                current-year="{{currentYear}}" class="pr20"></slider>
+
+        <button type="button" class="btn btn-default btn-sm" role="button" data-ng-click="filter();">Update</button>
+        <button type="button" class="btn btn-default btn-sm" role="button" data-ng-click="reset();">Reset</button>
+    </div>
 
     <h2>Number of drinks you bought</h2>
     <bar-chart data="barChartData"></bar-chart>

@@ -1,18 +1,20 @@
-<h1>Barkeeper Overview</h1>
-
-<table class="table table-hover table-bordered" style="width:50%;">
-    <thead>
-    <tr>
-        <th><a href="" ng-click="predicate = 'rank'; reverse=!reverse">Rank</a></th>
-        <th><a href="" ng-click="predicate = 'user'; reverse=!reverse">User</a></th>
-        <th><a href="" ng-click="predicate = 'sum'; reverse=!reverse">Expenses</a></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr data-ng-repeat="item in users | orderBy:predicate:reverse" data-ng-click="viewDetail(item.user)">
-        <td>{{item.rank}}</td>
-        <td>{{item.user}}</td>
-        <td>{{item.sum}}</td>
-    </tr>
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-md-6">
+        <table class="table table-hover table-bordered table-condensed">
+            <thead>
+            <tr>
+                <th><a href="" ng-click="predicate = 'rank'; reverse=!reverse">Rank</a></th>
+                <th><a href="" ng-click="predicate = 'user'; reverse=!reverse">User</a></th>
+                <th><a href="" ng-click="predicate = 'sum'; reverse=!reverse">Expenses (€)</a></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr data-ng-repeat="item in users | orderBy:predicate:reverse" data-ng-click="viewDetail(item.user);">
+                <td>{{item.rank}}</td>
+                <td>{{item.user}}</td>
+                <td>{{item.sum}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

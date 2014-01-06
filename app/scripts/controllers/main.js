@@ -35,6 +35,7 @@ angular.module('barkeeper.controllers', ['ngRoute', 'barkeeper.lineChart', 'bark
 
         var len = users.length;
 
+        //add the rank attribute
         for (var i = len - 1, r = 1; i > -1; --i, ++r) {
             if (i in users) {
                 var user = users[i];
@@ -51,20 +52,44 @@ angular.module('barkeeper.controllers', ['ngRoute', 'barkeeper.lineChart', 'bark
     }
 )
     .
-    controller('DetailCtrl', function ($scope, barChartData, lineChartData) {
+    controller('DetailCtrl', function ($scope, $routeParams, barChartData, lineChartData, stats) {
+
+        //Initialize data...
+        barChartData = _.isEmpty(barChartData) ? [] : barChartData;
+        lineChartData = _.isEmpty(lineChartData) ? [] : lineChartData;
+
         $scope.barChartData = barChartData;
         $scope.lineChartData = lineChartData;
 
-        var min = _.min(lineChartData, function(item) {
+        var min = _.min(lineChartData, function (item) {
             return item.date.getFullYear();
         });
 
-        var max = _.max(lineChartData, function(item) {
+        var max = _.max(lineChartData, function (item) {
             return item.date.getFullYear();
         });
 
         $scope.minYear = min.date.getFullYear();
         $scope.maxYear = max.date.getFullYear();
 
-        $scope.currentYear =  min.date.getFullYear();
+        $scope.currentYear = min.date.getFullYear();
+
+        $scope.filter = function () {
+            loadData($routeParams.userId, $scope.currentYear);
+        };
+
+        $scope.reset = function () {
+            loadData($routeParams.userId);
+        };
+
+        var loadData = function(userId, year) {
+            stats.costs(userId, year).then(function (costs) {
+                $scope.lineChartData = costs;
+            });
+
+            stats.drinks(userId, year).then(function (drinks) {
+                $scope.barChartData = drinks;
+            });
+        };
+
     });

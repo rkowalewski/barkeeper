@@ -4,6 +4,7 @@ var express = require('express')
     , path = require('path')
     , utils = require('./utils')
     , jsUtils = require('util')
+    , _ = require('lodash')
     ;
 
 var app = express();
@@ -96,6 +97,11 @@ app.get('/api/users/:user/costs', function (req, res) {
     utils.executeQuery(query, function (json) {
         res.send(json);
     });
+});
+
+app.get('/api/test', function(req, res) {
+    console.log(req.query.values);
+    res.send('OK');
 });
 
 app.listen(app.get('port'), function () {

@@ -1,17 +1,6 @@
-/*path {*/
-    /*stroke: steelblue;*/
-    /*stroke-width: 2;*/
-    /*fill: none;*/
-/*}*/
-
-/*line {*/
-    /*stroke: black;*/
-/*}*/
-
-/*text {*/
-    /*font-family: Arial;*/
-    /*font-size: 9pt;*/
-/*}*/
+.content {
+    padding: 90px 15px;
+}
 
 .axis path,
 .axis line {
@@ -30,6 +19,10 @@
     stroke-width: 1.5px;
 }
 
-#filter {
-    margin-top: 50px;
+.filterArea {
+    display: inline-block;
+}
+
+.slider {
+    margin-right: 20px;
 }

@@ -1,10 +1,10 @@
-angular.module('barkeeper.slider',['barkeeper.stats', 'ngRoute']).directive('slider', function ($parse, stats, $route) {
+angular.module('barkeeper.slider',['barkeeper.stats', 'ngRoute']).directive('slider', function ($parse) {
     return {
         restrict: 'E',
         replace: true,
         template: '<input type="text" />',
         link: function ($scope, element, attrs) {
-            var userId = $route.current.params.userId;
+//            var userId = $route.current.params.userId;
             var model = $parse(attrs.model);
 
             var min = parseInt(attrs.minYear),
@@ -24,16 +24,15 @@ angular.module('barkeeper.slider',['barkeeper.stats', 'ngRoute']).directive('sli
 
             slider.on('slide', function(ev) {
                 model.assign($scope, ev.value);
-                stats.costs(userId, ev.value).then(function(costs) {
-                    $scope.lineChartData = costs;
-                });
-
-                stats.drinks(userId, ev.value).then(function(drinks) {
-                    $scope.barChartData = drinks;
-                });
+//                stats.costs(userId, ev.value).then(function(costs) {
+//                    $scope.lineChartData = costs;
+//                });
+//
+//                stats.drinks(userId, ev.value).then(function(drinks) {
+//                    $scope.barChartData = drinks;
+//                });
 
                 $scope.$apply();
-
             });
         }
     }
