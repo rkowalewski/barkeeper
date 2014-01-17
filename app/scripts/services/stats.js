@@ -71,37 +71,73 @@ angular.module('barkeeper.stats', ['restangular'])
 
         }
 
+
         var transformLineChartData = function (costs) {
-            _.forEach(costs, function (item) {
+
+            //map to appropriate data types
+            costs = _.map(costs, function (item) {
                 var date = new Date(item.date * 1000);
-                var timeRemoved = new Date(date.getFullYear(), date.getMonth());
-                item.date = timeRemoved;
-                item.amount = Math.abs(item.amount);
+                return {
+                    date: new Date(date.getFullYear(), date.getMonth()),
+                    amount: Math.abs(item.amount)
+                };
             });
 
-            var groupedPerMonth = _.groupBy(costs, function (item) {
-                return item.date;
+            var monthRange = _.range(12);
+
+            var groupedByYear = _.groupBy(costs, function(item) {
+                return item.date.getFullYear();
             });
 
-            var amountsPerMonth = _.transform(groupedPerMonth, function (result, amounts, key) {
-                var sumAllAmounts = _.reduce(_.map(amounts, "amount"), function (sum, amount) {
-                    return sum + amount;
+            var lineChartData = _.transform(groupedByYear, function(result, amounts, year) {
+                var groupedByMonth = _.groupBy(amounts, function(amount) {
+                    return amount.date.getMonth();
                 });
-                result[key] = Math.round(sumAllAmounts * 100) / 100;
-                ;
-            });
 
-            var amountsPerMonthAsArray = _.transform(amountsPerMonth, function (result, value, key) {
-                var dateVal = new Date(key);
-                result.push({date: dateVal, amount: value});
-            }, []);
+                var amountsPerMonth = _.transform(groupedByMonth, function(result, amounts, month) {
+                    var sumAllAmounts = _.reduce(_.map(amounts, "amount"), function (sum, amount) {
+                        return sum + amount;
+                    });
 
-            amountsPerMonthAsArray.sort(function (a, b) {
-                return a.date - b.date;
-            });
+                    result.push(createLineChartItem(
+                        +month,
+                        Math.round(sumAllAmounts * 100) / 100
+                    ));
 
-            return amountsPerMonthAsArray;
+                }, []);
+
+                var includedMonths = _.map(_.keys(groupedByMonth), function(month) {
+                    return +month;
+                })
+
+                var notIncludedMonths = _.difference(monthRange, includedMonths);
+
+                _.forEach(notIncludedMonths, function(month) {
+                    amountsPerMonth.push(createLineChartItem(month,0));
+                });
+
+                amountsPerMonth.sort(function(a, b) {
+                    return a.month - b.month;
+                });
+
+                result.push({
+                    year: +year,
+                    values: amountsPerMonth
+                });
+
+
+            },[])
+
+            return lineChartData;
         };
+
+        var createLineChartItem = function(month, amount) {
+            return {
+                month: month,
+                amount: amount
+            }
+        }
+
 
         return {
             drinks: drinks,

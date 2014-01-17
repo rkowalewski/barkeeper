@@ -8,22 +8,24 @@ angular.module('barkeeper.lineChart', ['d3'])
             },
             link: function (scope, element, attrs) {
 
-                var margin = {top: 20, right: 20, bottom: 30, left: 50},
+                var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dez'];
+
+                var margin = {top: 20, right: 80, bottom: 30, left: 50},
                     width = 960 - margin.left - margin.right,
                     height = 500 - margin.top - margin.bottom;
 
+                var formatMonth = function(d) {
+                    return months[d % 12];
+                };
+
                 d3Service.d3().then(function (d3) {
 
-                    var svg = d3.select(element[0]).append('svg')
-                        .attr("width", width + margin.left + margin.right)
-                        .attr('height', height + margin.top + margin.bottom);
-
-                    // Watch for resize event
-                    scope.$watch(function () {
-                        return angular.element($window)[0].innerWidth;
-                    }, function () {
-                        scope.render(scope.data);
-                    });
+//                    Watch for resize event
+//                    scope.$watch(function () {
+//                        return angular.element($window)[0].innerWidth;
+//                    }, function () {
+//                        scope.render(scope.data);
+//                    });
 
                     scope.$parent.$watch('lineChartData', function(items) {
                         if (items.length > 0) {
@@ -31,87 +33,98 @@ angular.module('barkeeper.lineChart', ['d3'])
                         }
                     });
 
-                    var timeFormat = function(formats) {
-                        return function(date) {
-                            var i = formats.length - 1, f = formats[i];
-                            while (!f[1](date)) f = formats[--i];
-                            return f[0](date);
-                        };
-                    };
+                    var x = d3.scale.linear()
+                        .domain([0, 11])
+                        .range([0, width]);
 
-                    var dateFormatsFilter = timeFormat([
-                        [d3.time.format("%Y"), function() { return true; }],
-                        [d3.time.format("%b"), function(d) { return d.getMonth(); }]]);
+                    var y = d3.scale.linear()
+                        .range([height, 0]);
+
+                    var color = d3.scale.category10();
+
+                    var xAxis = d3.svg.axis()
+                        .scale(x)
+                        .orient("bottom")
+                        .tickFormat(formatMonth);
+
+                    var yAxis = d3.svg.axis()
+                        .scale(y)
+                        .orient("left");
+
+                    var line = d3.svg.line()
+                        .interpolate("basis")
+                        .x(function (d) {
+                            return x(d.month);
+                        })
+                        .y(function (d) {
+                            return y(d.amount);
+                        });
+
+                    var svg = d3.select(element[0]).append('svg')
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom)
+                        .append("g")
+                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
                     scope.render = function (data) {
                         svg.selectAll('*').remove();
 
-                        var minDate = d3.min(data, function(d) {
-                            return d.date;
-                        });
+                        color.domain(_.map(data, 'year'));
 
-                        var maxDate = d3.max(data, function(d) {
-                            return d.date;
-                        })
-
-                        var x = d3.time.scale().domain([minDate, maxDate])
-                            .range([0, width]);
-
-                        var y = d3.scale.linear().domain([0, d3.max(function (d) {
-                                return d.amount;
-                            })])
-                            .range([height, 0]);
-
-                        var xAxis = d3.svg.axis()
-                            .scale(x)
-                            .orient('bottom')
-                            .tickFormat(dateFormatsFilter);
-
-                        var yAxis = d3.svg.axis()
-                            .scale(y)
-                            .orient('left');
-
-                        var line = d3.svg.line()
-                            .x(function (d) {
-                                return x(d.date);
+                        y.domain([
+                            0,
+                            d3.max(data, function (d) {
+                                return d3.max(d.values, function (v) {
+                                    return v.amount;
+                                });
                             })
-                            .y(function (d) {
-                                return y(d.amount);
-                            });
+                        ]);
 
-                        var g = svg.append('g')
-                            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-
-                        x.domain(d3.extent(data, function (d) {
-                            return d.date;
-                        }));
-                        y.domain(d3.extent(data, function (d) {
-                            return d.amount;
-                        }));
-
-                        g.append('g')
-                            .attr('class', 'x axis')
-                            .attr('transform', 'translate(0,' + height + ')')
+                        svg.append("g")
+                            .attr("class", "x axis")
+                            .attr("transform", "translate(0," + height + ")")
                             .call(xAxis);
 
-                        g.append('g')
-                            .attr('class', 'y axis')
+                        svg.append("g")
+                            .attr("class", "y axis")
                             .call(yAxis)
-                            .append('text')
-                            .attr('transform', 'rotate(-90)')
-                            .attr('y', 6)
-                            .attr('dy', '.71em')
-                            .style('text-anchor', 'end')
-                            .text('Expenses (€)');
+                            .append("text")
+                            .attr("transform", "rotate(-90)")
+                            .attr("y", 6)
+                            .attr("dy", ".71em")
+                            .style("text-anchor", "end")
+                            .text("Expenses (€)");
 
-                        g.append('path')
-                            .datum(data)
-                            .attr('class', 'line')
-                            .attr('d', line);
+                        var city = svg.selectAll(".city")
+                            .data(data)
+                            .enter().append("g")
+                            .attr("class", "city");
+
+                        city.append("path")
+                            .attr("class", "line")
+                            .attr("d", function (d) {
+                                return line(d.values);
+                            })
+                            .style("stroke", function (d) {
+                                return color(d.year);
+                            });
+
+                        city.append("text")
+                            .datum(function (d) {
+                                return {year: d.year, value: d.values[d.values.length - 1]};
+                            })
+                            .attr("transform", function (d) {
+                                return "translate(" + x(d.value.month) + "," + y(d.value.amount) + ")";
+                            })
+                            .attr("x", 3)
+                            .attr("dy", ".35em")
+                            .text(function (d) {
+                                return d.year;
+                            });
                     };
+
+                    scope.render(scope.data);
                 });
             }
         }
-    }
-    ])
-;
+    }]);

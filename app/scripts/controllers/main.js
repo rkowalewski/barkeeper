@@ -61,18 +61,20 @@ angular.module('barkeeper.controllers', ['ngRoute', 'barkeeper.lineChart', 'bark
         $scope.barChartData = barChartData;
         $scope.lineChartData = lineChartData;
 
-        var min = _.min(lineChartData, function (item) {
-            return item.date.getFullYear();
+        var init = function (lineChartData) {
+            var years = _.map(lineChartData, 'year');
+
+            var min = _.min(years);
+            var max = _.max(years);
+            $scope.minYear = min;
+            $scope.maxYear = max;
+
+            $scope.currentYear = min;
+        };
+
+        $scope.$watch('lineChartData', function(data) {
+            init(data);
         });
-
-        var max = _.max(lineChartData, function (item) {
-            return item.date.getFullYear();
-        });
-
-        $scope.minYear = min.date.getFullYear();
-        $scope.maxYear = max.date.getFullYear();
-
-        $scope.currentYear = min.date.getFullYear();
 
         $scope.filter = function () {
             loadData($routeParams.userId, $scope.currentYear);
@@ -82,7 +84,7 @@ angular.module('barkeeper.controllers', ['ngRoute', 'barkeeper.lineChart', 'bark
             loadData($routeParams.userId);
         };
 
-        var loadData = function(userId, year) {
+        var loadData = function (userId, year) {
             stats.costs(userId, year).then(function (costs) {
                 $scope.lineChartData = costs;
             });
@@ -92,4 +94,5 @@ angular.module('barkeeper.controllers', ['ngRoute', 'barkeeper.lineChart', 'bark
             });
         };
 
+        init(lineChartData);
     });

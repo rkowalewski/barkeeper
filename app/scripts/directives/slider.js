@@ -24,14 +24,6 @@ angular.module('barkeeper.slider',['barkeeper.stats', 'ngRoute']).directive('sli
 
             slider.on('slide', function(ev) {
                 model.assign($scope, ev.value);
-//                stats.costs(userId, ev.value).then(function(costs) {
-//                    $scope.lineChartData = costs;
-//                });
-//
-//                stats.drinks(userId, ev.value).then(function(drinks) {
-//                    $scope.barChartData = drinks;
-//                });
-
                 $scope.$apply();
             });
         }
